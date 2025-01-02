@@ -2,6 +2,11 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::{Token, Mint};
 use crate::program::MaelstromSolana;
 
+/*
+Feature to be rolled out later
+Edit to make it so that individual token mints per card
+*/
+
 pub fn initialize_token_mint(_: Context<InitializeTokenMint>) -> Result<()> {
     Ok(())
 }
