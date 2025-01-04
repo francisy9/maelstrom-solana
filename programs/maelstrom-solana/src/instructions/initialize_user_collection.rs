@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+use crate::{state::user_collection::*, constants::CARD_UPDATE_AUTHORITY};
 
 pub fn initialize_user_collection(ctx: Context<InitializeUserCollection>, collection_id: u8) -> Result<()> {
     let user_collection = &mut ctx.accounts.user_collection;
@@ -8,23 +9,17 @@ pub fn initialize_user_collection(ctx: Context<InitializeUserCollection>, collec
     Ok(())
 }
 
-#[account]
-pub struct UserCollection {
-    collection_id: u8,
-    gold: u16,
-    card_count: [u8; 100],
-    bump: u8,
-}
-
 #[derive(Accounts)]
 #[instruction(collection_id: u8)]
 pub struct InitializeUserCollection<'info> {
-    #[account(mut)]
-    pub user: Signer<'info>,
+    /// CHECK: This is a user account used to check seed
+    pub user: UncheckedAccount<'info>,
     #[account(
         init,
-        payer = user,
+        payer = authority,
         space = 8 + 1 + 2 + 100 + 1, seeds = [b"user-collection", user.key().as_ref(), collection_id.to_le_bytes().as_ref()],  bump)]
     pub user_collection: Account<'info, UserCollection>,
+    #[account(mut, address = CARD_UPDATE_AUTHORITY)]
+    pub authority: Signer<'info>,
     pub system_program: Program<'info, System>
 }
