@@ -1,9 +1,13 @@
 use anchor_lang::prelude::*;
-use crate::{state::user_collection::*, constants::CARD_UPDATE_AUTHORITY};
+use crate::{state::user_collection::*, constants::*, errors::MaelstromSolanaError::CardIdTooLarge};
 
 pub fn increment_card_count(ctx: Context<IncrementCardCount>, card_update_argument: Vec<CardUpdateStruct>) -> Result<()> {
     let user_collection = &mut ctx.accounts.user_collection;
     for card_update in card_update_argument {
+        if card_update.card_id > MAX_CARD_ID {
+            return Err(CardIdTooLarge.into());
+        }
+
         let byte_array_index: usize = (card_update.card_id / 2) as usize;
 
         // TODO: Handle overflow in future
